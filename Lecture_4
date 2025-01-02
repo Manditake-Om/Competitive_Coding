@@ -1,0 +1,127 @@
+Aim: Write a program to deal with real-world situations where Stack data structure is widely used
+ Evaluation of expression: Stacks are used to evaluate expressions, especially in languages that use postfix or prefix notation. 
+Operators and operands are pushed onto the stack, and operations are performed based on the LIFO principle
+____________________________________________________________________________________________________________________________________________________________________________
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+struct Stack {
+    int* items;
+    int top;
+    int capacity;
+};
+
+void initStack(struct Stack* s, int capacity) {
+    s->items = (int*)malloc(capacity * sizeof(int));
+    s->top = -1;
+    s->capacity = capacity;
+}
+
+int isFull(struct Stack* s) {
+    return s->top == s->capacity - 1;
+}
+
+int isEmpty(struct Stack* s) {
+    return s->top == -1;
+}
+
+void push(struct Stack* s, int item) {
+    if (isFull(s)) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->items[++(s->top)] = item;
+}
+
+int pop(struct Stack* s) {
+    if (isEmpty(s)) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return s->items[(s->top)--];
+}
+
+void freeStack(struct Stack* s) {
+    free(s->items);
+}
+
+int evaluatePostfix(char* expression) {
+    struct Stack s;
+    initStack(&s, 100); 
+    for (int i = 0; i < strlen(expression); i++) {
+        char token = expression[i];
+
+        if (isspace(token)) {
+            continue; // Skip spaces
+        }
+
+        if (isdigit(token)) {
+            int num = 0;
+            while (i < strlen(expression) && isdigit(expression[i])) {
+                num = num * 10 + (expression[i] - '0');
+                i++;
+            }
+            i--; 
+            push(&s, num);
+        } else if (token == '+' || token == '-' || token == '*' || token == '/') {
+            int operand2 = pop(&s);
+            int operand1 = pop(&s);
+            int result;
+
+            switch (token) {
+                case '+':
+                    result = operand1 + operand2;
+                    break;
+                case '-':
+                    result = operand1 - operand2;
+                    break;
+                case '*':
+                    result = operand1 * operand2;
+                    break;
+                case '/':
+                    if (operand2 == 0) {
+                        printf("Error: Division by zero\n");
+                        freeStack(&s);
+                        return -1;
+                    }
+                    result = operand1 / operand2;
+                    break;
+                default:
+                    printf("Invalid operator\n");
+                    freeStack(&s);
+                    return -1;
+            }
+
+            push(&s, result);
+        } else {
+            printf("Invalid character in expression: %c\n", token);
+            freeStack(&s);
+            return -1;
+        }
+    }
+
+    int finalResult = pop(&s);
+    if (!isEmpty(&s)) {
+        printf("Error: Invalid postfix expression\n");
+        freeStack(&s);
+        return -1;
+    }
+
+    freeStack(&s);
+    return finalResult;
+}
+
+int main() {
+    char expression[100];
+    printf("Enter a postfix expression: ");
+    fgets(expression, sizeof(expression), stdin);
+    expression[strcspn(expression, "\n")] = 0; 
+
+    int result = evaluatePostfix(expression);
+    if (result != -1) {
+        printf("Result of postfix expression '%s' is: %d\n", expression, result);
+    }
+    return 0;
+}
