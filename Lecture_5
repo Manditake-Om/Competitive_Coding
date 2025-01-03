@@ -40,3 +40,9 @@ int main()
     nextGreaterElement(arr, n);
     return 0;
 }
+_______________________________________________________________________________________________________________________________________________________________________
+Write a program to design a circular queue(k) which Should implement the below functions
+ a. Enqueue
+ b. Dequeue
+ c. Front
+ d. Rear
