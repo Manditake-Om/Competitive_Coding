@@ -1,0 +1,45 @@
+
+
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#define MAX 100
+
+void nextGreaterElement(int arr[], int n)
+{
+    int stack[MAX];
+    int top = -1;
+
+    for(int i = n - 1; i >= 0; i--)
+    {
+        // Pop elements smaller than or equal to arr[i]
+        while(top != -1 && stack[top] <= arr[i])
+        {
+            top--;
+        }
+
+        // If stack is not empty, the next greater element exists
+        if(top != -1)
+        {
+            printf("Next Greater Element for %d is %d\n", arr[i], stack[top]);
+        }
+        else
+        {
+            printf("Next Greater Element for %d is None\n", arr[i]);
+        }
+        stack[++top] = arr[i];
+    }
+}
+
+int main()
+{
+    int arr[] = {4,5,2,10,8};
+    int n = sizeof(arr)/sizeof(arr[0]);
+
+    printf("Next Greater Element  for each element in the arrray:\n");
+    nextGreaterElement(arr, n);
+    return 0;
+}
